@@ -17,5 +17,5 @@ def post_view(request):
 
 def hash_view(request):
     if request.method == 'GET':
-        context = {'posts': Hashtag.objects.all()}
+        context = {'hashtags': Hashtag.objects.all()}
         return render(request, 'hashtag/hashtag.html', context=context)
