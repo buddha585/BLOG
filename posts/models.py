@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Post(models.Model):
@@ -8,8 +8,7 @@ class Post(models.Model):
     image = models.ImageField()
     price = models.FloatField()
     rate = models.DecimalField(max_digits=10, decimal_places=1)
-    hashtag = models.ForeignKey(Hashtag, on_delete=models.CASCADE)
-    hashtags = models.ManyToManyField(Hashtag, blank=True)
+    hashtags = models.ManyToManyField('Hashtag', blank=True)
     def str(self):
         return self.title
 
@@ -20,6 +19,10 @@ class Hashtag(models.Model):
     def str(self):
         return self.title
 
-# class Review(models.Model):
-#     author = models.ForeignKey(User, on_delete=models.CASCADE)
-#     text = models
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    def __str__(self):
+        return f'{self.author.username}_{self.text}'
+
