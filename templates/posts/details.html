@@ -5,11 +5,13 @@
         .image > img {
             width: 50%;
             margin-left: 25%;
+            height: 50%;
         }
 
         .comment {
-            width: 70%;
-            margin-left: 15%;
+            width: 80%;
+            margin-left: 30%;
+            justify-content: center;
         }
 
         .comment > div {
@@ -26,7 +28,7 @@
         }
 
         .text {
-            font-size: 15px;
+            font-size: 12px;
             font-family: sans-serif;
         }
         .post {
@@ -39,13 +41,13 @@
             <img src="/media/{{ post.image }}/" alt="">
         </div>
         <div>
-            <div style="display:flex; justify-content: space-between">
+            <div style="display:flex; justify-content: center">
                 <h1>{{ post.title }}</h1>
                 <h3>{{ post.author.username }}</h3>
             </div>
-            <h5>{{ post.description }}</h5>
+            <h5 style="display: flex; justify-content: center">{{ post.description }}</h5>
             <div>
-                <p>{{ product.price }}</p>
+                <p>{{ post.price }}</p>
             </div>
         </div>
     </div>
