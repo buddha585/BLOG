@@ -1,6 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from posts.models import *
-from django.http import HttpResponse
 # Create your views here.
 
 def main(request):
@@ -11,10 +10,19 @@ def main(request):
         }
         return render(request, 'layouts/main.html', context=data)
 
+
 def post_view(request):
     if request.method == 'GET':
-        context = {'posts': Post.objects.all()}
+        hashtag_id = request.GET.get('hashtag_id')
+        if hashtag_id:
+            posts = Post.objects.filter(hashtag=Hashtag.objects.get(id=hashtag_id))
+        else:
+            posts = Post.objects.all()
+        context = {
+            'posts': posts
+        }
         return render(request, 'posts/posts.html', context=context)
+
 
 def hash_view(request):
     if request.method == 'GET':
