@@ -35,9 +35,9 @@
             width: 70%;
             margin-left: 15%;
         }
-        .create_review{
-            width: 60%;
-            margin-left: 10%;
+        .create_comment{
+            width: 70%;
+            margin-left: 5%;
         }
     </style>
     <div class="post">
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="create_comment">
-    <form action="/posts{{ post.id }}">
+    <form action="/posts/{{ post.id }}/" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" class="btn btn-primary" value="оставить комментарий">
