@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from posts.models import *
 from posts.forms import PostCreateForm, CommentCreateForm
+from users.utils import get_user_from_request
 # Create your views here.
 
 def main(request):
@@ -19,15 +20,19 @@ def post_view(request):
             posts = Post.objects.filter(hashtag=Hashtag.objects.get(id=hashtag_id))
         else:
             posts = Post.objects.all()
-        context = {
-            'posts': posts
+        data = {
+            'posts': posts,
+            'user': get_user_from_request(request)
+
         }
-        return render(request, 'posts/posts.html', context=context)
+        return render(request, 'posts/posts.html', context=data)
 
 
 def hash_view(request):
     if request.method == 'GET':
-        context = {'hashtags': Hashtag.objects.all()}
+        context = {'hashtags': Hashtag.objects.all(),
+                   'user': get_user_from_request(request)
+                   }
         return render(request, 'hashtag/hashtag.html', context=context)
 
 def post_detail_view(request, **kwargs):
@@ -36,7 +41,8 @@ def post_detail_view(request, **kwargs):
         data = {
             'post':post,
             'comments': Comment.objects.filter(post_id=kwargs['id']),
-            'form': CommentCreateForm
+            'form': CommentCreateForm,
+            'user':get_user_from_request(request)
         }
 
         return render(request, 'posts/details.html', context=data)
@@ -57,7 +63,8 @@ def post_detail_view(request, **kwargs):
             data = {
                 'post': product,
                 'comments': comment,
-                'form': CommentCreateForm
+                'form': CommentCreateForm,
+                'users': get_user_from_request(request)
             }
             return render(request, 'posts/detail.html', context=data)
 
@@ -65,7 +72,8 @@ def post_detail_view(request, **kwargs):
 def posts_create_view(request):
     if request.method == 'GET':
         data = {
-            'form': PostCreateForm
+            'form': PostCreateForm,
+            'user': get_user_from_request(request)
         }
         return render(request, 'posts/create.html', context=data)
     if request.method == 'POST':
@@ -82,6 +90,7 @@ def posts_create_view(request):
             return redirect('/posts')
         else:
             data = {
-            'form': form
+            'form': form,
+            'user': get_user_from_request(request)
             }
             return render(request, 'posts/create.html', context=data)
