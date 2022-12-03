@@ -12,19 +12,33 @@ def main(request):
         }
         return render(request, 'layouts/main.html', context=data)
 
+PAGINATION_LIMIT = 4
 
 def post_view(request):
     if request.method == 'GET':
         hashtag_id = request.GET.get('hashtag_id')
+        search_text = request.GET.get('search')
+        page=int(request.GET.get('page', 1))
         if hashtag_id:
             posts = Post.objects.filter(hashtag=Hashtag.objects.get(id=hashtag_id))
         else:
             posts = Post.objects.all()
+
+        if search_text:
+            posts = posts.filter(title__icontains=search_text)
+
+        max_page = round(posts.__len__() / PAGINATION_LIMIT)
+        posts = posts[PAGINATION_LIMIT * (page - 1):PAGINATION_LIMIT * page]
+
+
         data = {
             'posts': posts,
-            'user': get_user_from_request(request)
+            'user': get_user_from_request(request),
+            'hashtag': hashtag_id,
+            'max_page': range(1, max_page+1)
 
         }
+
         return render(request, 'posts/posts.html', context=data)
 
 
