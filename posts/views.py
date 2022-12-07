@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from posts.models import *
 from posts.forms import PostCreateForm, CommentCreateForm
 from users.utils import get_user_from_request
+from django.views.generic import ListView, CreateView
 # Create your views here.
 
 def main(request):
@@ -41,14 +42,14 @@ def post_view(request):
 
         return render(request, 'posts/posts.html', context=data)
 
-
-def hash_view(request):
-    if request.method == 'GET':
-        context = {'hashtags': Hashtag.objects.all(),
-                   'user': get_user_from_request(request)
-                   }
-        return render(request, 'hashtag/hashtag.html', context=context)
-
+class HashtagView(ListView):
+    model = Hashtag
+    template_name = 'hashtag/hashtag.html'
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return {
+            'object_list': self.get_queryset(),
+            'user': get_user_from_request(self.request)
+        }
 def post_detail_view(request, **kwargs):
     if request.method == 'GET':
         post = Post.objects.get(id=kwargs['id'])
@@ -99,7 +100,7 @@ def posts_create_view(request):
             description=form.cleaned_data.get('description'),
             rate=form.cleaned_data.get('rate'),
             price = form.cleaned_data.get('price'),
-            hashtag=form.cleaned_data.get('hashtag')
+            hashtag_id=form.cleaned_data.get('hashtag')
             )
             return redirect('/posts')
         else:
@@ -108,3 +109,28 @@ def posts_create_view(request):
             'user': get_user_from_request(request)
             }
             return render(request, 'posts/create.html', context=data)
+
+class PostsCreateView(ListView, CreateView):
+    model= Post
+    template = 'posts/create.html'
+    form_class = PostCreateForm
+
+    def get_context_data(self, *, object_list=None, **kwargs,):
+        return {
+            'form': kwargs['form'] if kwargs.get('form') else self.form_class,
+            'user': get_user_from_request(self.request)
+        }
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(data=request.POST)
+
+        if form.is_valid():
+            self.model.objects.create(
+                title=form.cleaned_data.get('title'),
+                description=form.cleaned_data.get('description'),
+                rate=form.cleaned_data.get('rate'),
+                price=form.cleaned_data.get('price'),
+                hashtag_id=form.cleaned_data.get('hashtag')
+            )
+            return redirect('/posts')
+        else:
+            return render(request, self.template_name, context=self.get_context_data(form=form))
